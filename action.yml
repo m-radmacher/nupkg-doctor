@@ -1,0 +1,13 @@
+name: 'rdmchr-test-action'
+description: 'Pushes NuGet packages to the GitHub registry'
+author: 'radmacher'
+inputs:
+  repository:
+    required: true
+    description: 'To which repository this package belongs. (e.g. Hetkamp-DEV/HetkampToolbox)'
+  token:
+    required: true
+    description: 'A Personal access token to push to the GitHub registry'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
