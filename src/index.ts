@@ -9,7 +9,7 @@ async function run() {
   const baseDirectory = core.getInput('directory');
   // list all files & find .nupkg
   let nupkgFile;
-  const nupkgFiles = fs.readdirSync("baseDirectory");
+  const nupkgFiles = fs.readdirSync(baseDirectory);
   console.log("Searching for .nupkg...");
   core.debug("Found these files: " + nupkgFiles.join("; "));
   for (const file of nupkgFiles) {
