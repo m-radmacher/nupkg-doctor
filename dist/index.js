@@ -65,7 +65,7 @@ function run() {
             throw new Error("Could not find .nupkg file. Make sure it got generated.");
         }
         console.log("Found .nupkg file. Extracting...");
-        yield (0, extract_zip_1.default)(path_1.default.join(baseDirectory, nupkgFile), { dir: "extracted-nupkg" });
+        yield (0, extract_zip_1.default)(path_1.default.join(__dirname, baseDirectory, nupkgFile), { dir: "extracted-nupkg" });
         // Find .nuspec file
         console.log("Extracted .nupkg file content. Searching for .nuspec file...");
         let nuspecFile;

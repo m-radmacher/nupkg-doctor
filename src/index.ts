@@ -23,7 +23,7 @@ async function run() {
   }
   console.log("Found .nupkg file. Extracting...");
 
-  await extract(path.join(baseDirectory, nupkgFile), { dir: "extracted-nupkg" });
+  await extract(path.join(__dirname, baseDirectory, nupkgFile), { dir: "extracted-nupkg" });
 
   // Find .nuspec file
   console.log("Extracted .nupkg file content. Searching for .nuspec file...");

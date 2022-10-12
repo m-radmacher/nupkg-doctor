@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "package": "ncc build --source-map"
+    "package": "ncc build --source-map",
+    "p": "yarn build && yarn package"
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
