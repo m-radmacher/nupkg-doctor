@@ -1,15 +1,22 @@
 import * as core from "@actions/core";
 import * as io from "@actions/io";
+import * as exec from "@actions/exec";
 import extract from 'extract-zip';
 import * as fs from 'fs';
 import { XMLBuilder, XMLParser } from "fast-xml-parser";
 import path from "path";
+import archiver from 'archiver';
 
 async function run() {
-  const repository = core.getInput('repository');
-  const dir = core.getInput('directory');
+  const repository = core.getInput("repository");
+  const pat = core.getInput("token");
+  const dir = core.getInput("directory");
   const base = process.env.GITHUB_WORKSPACE as string;
-  const baseDirectory = path.join(base, dir)
+  const baseDirectory = path.join(base, dir);
+
+  core.debug("Repository: " + repository);
+  core.debug("Base directory: " + baseDirectory);
+
   // list all files & find .nupkg
   let nupkgFile;
   const nupkgFiles = fs.readdirSync(baseDirectory);
@@ -26,27 +33,33 @@ async function run() {
   }
   console.log("Found .nupkg file. Extracting...");
 
-  await extract(path.join(baseDirectory, nupkgFile), { dir: path.join(baseDirectory, "extracted-nupkg") });
+  await extract(path.join(baseDirectory, nupkgFile), {
+    dir: path.join(baseDirectory, "extracted-nupkg"),
+  });
 
   // Find .nuspec file
   console.log("Extracted .nupkg file content. Searching for .nuspec file...");
   let nuspecFile;
-  const nuspecFiles = fs.readdirSync(path.join(baseDirectory, "extracted-nupkg"));
+  const nuspecFiles = fs.readdirSync(
+    path.join(baseDirectory, "extracted-nupkg")
+  );
   for (const file of nuspecFiles) {
-    if (file.endsWith('.nuspec')) {
+    if (file.endsWith(".nuspec")) {
       nuspecFile = file;
       break;
     }
   }
   if (!nuspecFile) {
-    throw new Error('Could not find .nuspec file.');
+    throw new Error("Could not find .nuspec file.");
   }
-  console.log('Found .nuspec file. Reading File...');
+  console.log("Found .nuspec file. Reading File...");
 
   // Read .nuspec file
-  const nuspecFileContent = fs.readFileSync(path.join(baseDirectory, "extracted-nupkg", nuspecFile));
+  const nuspecFileContent = fs.readFileSync(
+    path.join(baseDirectory, "extracted-nupkg", nuspecFile)
+  );
   core.debug(".nuspec content: " + nuspecFileContent);
-  console.log("Read .nuspec file. Parsing file...")
+  console.log("Read .nuspec file. Parsing file...");
 
   // Parse .nuspec File
   const parser = new XMLParser({ ignoreAttributes: false });
@@ -57,18 +70,61 @@ async function run() {
   // Add fields to object
   jsonObject.package.metadata.repository = {
     "@_type": "git",
-    "url": `https://github.com/${repository}`
+    "@_url": `https://github.com/${repository}`,
   };
 
   // Write new .nuspec File
-  const builder = new XMLBuilder({format: true, ignoreAttributes: false});
+  const builder = new XMLBuilder({ format: true, ignoreAttributes: false });
   const xmlContent = builder.build(jsonObject);
   core.debug("Modified XML: " + xmlContent);
   fs.writeFileSync(nuspecFile, xmlContent);
+  console.log("Modified .nuspec file. Deleting old .nupkg...");
+
+  // delete old .nupkg
+  fs.rmSync(path.join(baseDirectory, nupkgFile));
+  console.log("Deleted old .nupkg. Writing new .nupkg...");
 
   // Zip files
-  // Change .zip file ending to .nupkg
+  const archive = archiver("zip");
+  const output = fs.createWriteStream(path.join(baseDirectory, nupkgFile));
+  output.on("close", () => {
+    console.log(
+      `Wrote new .nupkg (${archive.pointer()} bytes). Pushing .nupkg to GitHub registry...`
+    );
+  });
+  archive.on("error", (err) => {
+    console.error("Encountered an error while zipping files.");
+    throw err;
+  });
+  archive.pipe(output);
+  archive.directory(path.join(baseDirectory, "extracted-nupkg"), false);
+  await archive.finalize();
+
+  const owner = repository.split("/")[1];
+  if (!owner) {
+    throw new Error(
+      "Could not find owner of repository. Make sure the repository you passed is valid (<Owner>/<Repository>)"
+    );
+  }
   // Push .nupkg to GitHub Registry
+  await exec.exec("nuget", [
+    "push",
+    path.join(baseDirectory, nupkgFile),
+    "-Source",
+    `"https://nuget.pkg.github.com/${owner}/index.json"`,
+    "-ApiKey",
+    pat,
+  ], {
+    listeners: {
+      stdout: (data: Buffer) => {
+        console.log(data.toString());
+      },
+      stderr: (data: Buffer) => {
+        console.error(data.toString());
+      }
+    },
+  });
+  console.log("Pushed .nupkg to GitHub repository.");
 }
 
 run();
