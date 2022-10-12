@@ -1,7 +1,8 @@
 import * as core from "@actions/core";
+import * as io from "@actions/io";
 import extract from 'extract-zip';
 import * as fs from 'fs';
-import { XMLParser } from "fast-xml-parser";
+import { XMLBuilder, XMLParser } from "fast-xml-parser";
 
 async function run() {
   // list all files & find .nupkg
@@ -48,7 +49,17 @@ async function run() {
   // Parse .nuspec File
   const parser = new XMLParser({ ignoreAttributes: false });
   const jsonObject = parser.parse(nuspecFileContent);
-  console.log(jsonObject);
+  core.debug("Parsed .nuspec content: " + JSON.stringify(jsonObject));
+  console.log("Parsed .nuspec file. Modifying file...");
+
+  // Add fields to object
+  jsonObject.repository = "Test";
+
+  // Write new .nuspec File
+  const builder = new XMLBuilder({});
+  const xmlContent = builder.build(jsonObject);
+  core.debug("Modified XML: " + xmlContent);
+  fs.writeFileSync(nuspecFile, xmlContent);
 }
 
 run();

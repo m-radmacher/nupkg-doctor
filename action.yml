@@ -1,6 +1,9 @@
-name: 'rdmchr-test-action'
-description: 'Pushes NuGet packages to the GitHub registry'
+name: 'nupkg-doctor'
+description: 'Modifies .nupkg files and then pushes them to the GitHub registry'
 author: 'radmacher'
+branding:
+  icon: 'box'
+  color: 'blue'
 inputs:
   repository:
     required: true

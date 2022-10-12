@@ -90,7 +90,15 @@ function run() {
         // Parse .nuspec File
         const parser = new fast_xml_parser_1.XMLParser({ ignoreAttributes: false });
         const jsonObject = parser.parse(nuspecFileContent);
-        console.log(jsonObject);
+        core.debug("Parsed .nuspec content: " + JSON.stringify(jsonObject));
+        console.log("Parsed .nuspec file. Modifying file...");
+        // Add fields to object
+        jsonObject.repository = "Test";
+        // Write new .nuspec File
+        const builder = new fast_xml_parser_1.XMLBuilder({});
+        const xmlContent = builder.build(jsonObject);
+        core.debug("Modified XML: " + xmlContent);
+        fs.writeFileSync(nuspecFile, xmlContent);
     });
 }
 run();
