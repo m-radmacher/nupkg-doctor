@@ -92,9 +92,9 @@ function run() {
         core.debug("Parsed .nuspec content: " + JSON.stringify(jsonObject));
         console.log("Parsed .nuspec file. Modifying file...");
         // Add fields to object
-        jsonObject.repository = "Test";
+        jsonObject.metadata.repository = "Test";
         // Write new .nuspec File
-        const builder = new fast_xml_parser_1.XMLBuilder({});
+        const builder = new fast_xml_parser_1.XMLBuilder({ format: true, ignoreAttributes: false });
         const xmlContent = builder.build(jsonObject);
         core.debug("Modified XML: " + xmlContent);
         fs.writeFileSync(nuspecFile, xmlContent);
