@@ -10,6 +10,7 @@ import archiver from 'archiver';
 async function run() {
   const repository = core.getInput("repository");
   const pat = core.getInput("token");
+  const pushToReg = core.getBooleanInput('push');
   const dir = core.getInput("directory");
   const base = process.env.GITHUB_WORKSPACE as string;
   const baseDirectory = path.join(base, dir);
@@ -89,7 +90,9 @@ async function run() {
   const output = fs.createWriteStream(path.join(baseDirectory, nupkgFile));
   output.on("close", () => {
     console.log(
-      `Wrote new .nupkg (${archive.pointer()} bytes). Pushing .nupkg to GitHub registry...`
+      `Wrote new .nupkg (${archive.pointer()} bytes). ${
+        pushToReg ? "Pushing .nupkg to GitHub registry..." : ""
+      }`
     );
   });
   archive.on("error", (err) => {
@@ -100,6 +103,8 @@ async function run() {
   archive.directory(path.join(baseDirectory, "extracted-nupkg"), false);
   await archive.finalize();
 
+  if (!pushToReg) return;
+
   // Push .nupkg to GitHub Registry
   const owner = repository.split("/")[0];
   if (!owner) {
@@ -107,7 +112,7 @@ async function run() {
       "Could not find owner of repository. Make sure the repository you passed is valid (<Owner>/<Repository>)"
     );
   }
-  await exec.exec("nuget", [
+  exec.exec("nuget", [
     "push",
     path.join(baseDirectory, nupkgFile),
     "-Source",

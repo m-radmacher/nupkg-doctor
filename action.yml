@@ -14,6 +14,9 @@ inputs:
   token:
     required: true
     description: 'A Personal access token to push to the GitHub registry'
+  push:
+    required: false
+    default: true
 runs:
   using: 'node16'
   main: 'dist/index.js'

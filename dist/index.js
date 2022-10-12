@@ -53,6 +53,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const repository = core.getInput("repository");
         const pat = core.getInput("token");
+        const pushToReg = core.getBooleanInput('push');
         const dir = core.getInput("directory");
         const base = process.env.GITHUB_WORKSPACE;
         const baseDirectory = path_1.default.join(base, dir);
@@ -117,7 +118,7 @@ function run() {
         const archive = (0, archiver_1.default)("zip");
         const output = fs.createWriteStream(path_1.default.join(baseDirectory, nupkgFile));
         output.on("close", () => {
-            console.log(`Wrote new .nupkg (${archive.pointer()} bytes). Pushing .nupkg to GitHub registry...`);
+            console.log(`Wrote new .nupkg (${archive.pointer()} bytes). ${pushToReg ? "Pushing .nupkg to GitHub registry..." : ""}`);
         });
         archive.on("error", (err) => {
             console.error("Encountered an error while zipping files.");
@@ -126,12 +127,14 @@ function run() {
         archive.pipe(output);
         archive.directory(path_1.default.join(baseDirectory, "extracted-nupkg"), false);
         yield archive.finalize();
+        if (!pushToReg)
+            return;
         // Push .nupkg to GitHub Registry
         const owner = repository.split("/")[0];
         if (!owner) {
             throw new Error("Could not find owner of repository. Make sure the repository you passed is valid (<Owner>/<Repository>)");
         }
-        yield exec.exec("nuget", [
+        exec.exec("nuget", [
             "push",
             path_1.default.join(baseDirectory, nupkgFile),
             "-Source",
