@@ -5,6 +5,9 @@ branding:
   icon: 'box'
   color: 'blue'
 inputs:
+  directory:
+    required: false
+    description: 'Path to the directory containing the .nupkg file'
   repository:
     required: true
     description: 'To which repository this package belongs. (e.g. Hetkamp-DEV/HetkampToolbox)'

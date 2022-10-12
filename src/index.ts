@@ -3,11 +3,13 @@ import * as io from "@actions/io";
 import extract from 'extract-zip';
 import * as fs from 'fs';
 import { XMLBuilder, XMLParser } from "fast-xml-parser";
+import path from "path";
 
 async function run() {
+  const baseDirectory = core.getInput('directory');
   // list all files & find .nupkg
   let nupkgFile;
-  const nupkgFiles = fs.readdirSync(".");
+  const nupkgFiles = fs.readdirSync("baseDirectory");
   console.log("Searching for .nupkg...");
   core.debug("Found these files: " + nupkgFiles.join("; "));
   for (const file of nupkgFiles) {
@@ -29,7 +31,7 @@ async function run() {
   // Find .nuspec file
   console.log("Extracted .nupkg file content. Searching for .nuspec file...");
   let nuspecFile;
-  const nuspecFiles = fs.readdirSync("extracted-nupkg");
+  const nuspecFiles = fs.readdirSync(path.join(baseDirectory, "extracted-nupkg"));
   for (const file of nuspecFiles) {
     if (file.endsWith('.nuspec')) {
       nuspecFile = file;

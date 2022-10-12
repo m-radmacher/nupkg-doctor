@@ -46,11 +46,13 @@ const core = __importStar(__nccwpck_require__(2186));
 const extract_zip_1 = __importDefault(__nccwpck_require__(460));
 const fs = __importStar(__nccwpck_require__(7147));
 const fast_xml_parser_1 = __nccwpck_require__(2603);
+const path_1 = __importDefault(__nccwpck_require__(1017));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const baseDirectory = core.getInput('directory');
         // list all files & find .nupkg
         let nupkgFile;
-        const nupkgFiles = fs.readdirSync(".");
+        const nupkgFiles = fs.readdirSync("baseDirectory");
         console.log("Searching for .nupkg...");
         core.debug("Found these files: " + nupkgFiles.join("; "));
         for (const file of nupkgFiles) {
@@ -72,7 +74,7 @@ function run() {
         // Find .nuspec file
         console.log("Extracted .nupkg file content. Searching for .nuspec file...");
         let nuspecFile;
-        const nuspecFiles = fs.readdirSync("extracted-nupkg");
+        const nuspecFiles = fs.readdirSync(path_1.default.join(baseDirectory, "extracted-nupkg"));
         for (const file of nuspecFiles) {
             if (file.endsWith('.nuspec')) {
                 nuspecFile = file;
