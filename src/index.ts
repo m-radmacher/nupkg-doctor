@@ -10,6 +10,7 @@ async function run() {
   const repository = core.getInput("repository");
   const pat = core.getInput("token");
   const pushToReg = core.getBooleanInput('push');
+  const skipDuplicate = core.getBooleanInput('skipduplicate');
   const dir = core.getInput("directory");
   const base = process.env.GITHUB_WORKSPACE as string;
   const baseDirectory = path.join(base, dir);
@@ -111,24 +112,29 @@ async function run() {
       "Could not find owner of repository. Make sure the repository you passed is valid (<Owner>/<Repository>)"
     );
   }
-  exec.exec("nuget", [
-    "push",
-    path.join(baseDirectory, nupkgFile),
-    "-Source",
-    `https://nuget.pkg.github.com/${owner}/index.json`,
-    "-ApiKey",
-    pat,
-    "-NonInteractive"
-  ], {
-    listeners: {
-      stdout: (data: Buffer) => {
-        console.log(data.toString());
+  exec.exec(
+    "nuget",
+    [
+      "push",
+      path.join(baseDirectory, nupkgFile),
+      "-Source",
+      `https://nuget.pkg.github.com/${owner}/index.json`,
+      "-ApiKey",
+      pat,
+      "-NonInteractive",
+      `${skipDuplicate ? "-SkipDuplicate" : ""}`,
+    ],
+    {
+      listeners: {
+        stdout: (data: Buffer) => {
+          console.log(data.toString());
+        },
+        stderr: (data: Buffer) => {
+          console.error(data.toString());
+        },
       },
-      stderr: (data: Buffer) => {
-        console.error(data.toString());
-      }
-    },
-  });
+    }
+  );
   console.log("Pushed .nupkg to GitHub repository.");
 }
 

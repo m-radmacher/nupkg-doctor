@@ -17,6 +17,11 @@ inputs:
   push:
     required: false
     default: true
+    description: 'Whether this function should run nuget push'
+  skipduplicate:
+    required: false
+    default: true
+    description: 'Whether the nuget push command should be run with the SkipDuplicate flag'
 runs:
   using: 'node16'
   main: 'dist/index.js'

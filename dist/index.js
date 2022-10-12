@@ -54,6 +54,7 @@ function run() {
         const repository = core.getInput("repository");
         const pat = core.getInput("token");
         const pushToReg = core.getBooleanInput('push');
+        const skipDuplicate = core.getBooleanInput('skipduplicate');
         const dir = core.getInput("directory");
         const base = process.env.GITHUB_WORKSPACE;
         const baseDirectory = path_1.default.join(base, dir);
@@ -141,7 +142,8 @@ function run() {
             `https://nuget.pkg.github.com/${owner}/index.json`,
             "-ApiKey",
             pat,
-            "-NonInteractive"
+            "-NonInteractive",
+            `${skipDuplicate ? "-SkipDuplicate" : ""}`,
         ], {
             listeners: {
                 stdout: (data) => {
@@ -149,7 +151,7 @@ function run() {
                 },
                 stderr: (data) => {
                     console.error(data.toString());
-                }
+                },
             },
         });
         console.log("Pushed .nupkg to GitHub repository.");
