@@ -100,18 +100,18 @@ async function run() {
   archive.directory(path.join(baseDirectory, "extracted-nupkg"), false);
   await archive.finalize();
 
+  // Push .nupkg to GitHub Registry
   const owner = repository.split("/")[1];
   if (!owner) {
     throw new Error(
       "Could not find owner of repository. Make sure the repository you passed is valid (<Owner>/<Repository>)"
     );
   }
-  // Push .nupkg to GitHub Registry
   await exec.exec("nuget", [
     "push",
     path.join(baseDirectory, nupkgFile),
     "-Source",
-    `"https://nuget.pkg.github.com/${owner}/index.json"`,
+    `https://nuget.pkg.github.com/${owner}/index.json`,
     "-ApiKey",
     pat,
   ], {
