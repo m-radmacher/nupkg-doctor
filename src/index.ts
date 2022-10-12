@@ -78,7 +78,7 @@ async function run() {
   const builder = new XMLBuilder({ format: true, ignoreAttributes: false });
   const xmlContent = builder.build(jsonObject);
   core.debug("Modified XML: " + xmlContent);
-  fs.writeFileSync(nuspecFile, xmlContent);
+  fs.writeFileSync(path.join(baseDirectory, "extracted-nupkg", nuspecFile), xmlContent);
   console.log("Modified .nuspec file. Deleting old .nupkg...");
 
   // delete old .nupkg
