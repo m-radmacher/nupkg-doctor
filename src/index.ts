@@ -114,6 +114,7 @@ async function run() {
     `https://nuget.pkg.github.com/${owner}/index.json`,
     "-ApiKey",
     pat,
+    "-NonInteractive"
   ], {
     listeners: {
       stdout: (data: Buffer) => {
