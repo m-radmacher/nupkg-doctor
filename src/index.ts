@@ -6,6 +6,7 @@ import { XMLBuilder, XMLParser } from "fast-xml-parser";
 import path from "path";
 
 async function run() {
+  const repository = core.getInput('repository');
   const dir = core.getInput('directory');
   const base = process.env.GITHUB_WORKSPACE as string;
   const baseDirectory = path.join(base, dir)
@@ -54,13 +55,20 @@ async function run() {
   console.log("Parsed .nuspec file. Modifying file...");
 
   // Add fields to object
-  jsonObject.metadata.repository = "Test";
+  jsonObject.package.metadata.repository = {
+    "@_type": "git",
+    "url": `https://github.com/${repository}`
+  };
 
   // Write new .nuspec File
   const builder = new XMLBuilder({format: true, ignoreAttributes: false});
   const xmlContent = builder.build(jsonObject);
   core.debug("Modified XML: " + xmlContent);
   fs.writeFileSync(nuspecFile, xmlContent);
+
+  // Zip files
+  // Change .zip file ending to .nupkg
+  // Push .nupkg to GitHub Registry
 }
 
 run();

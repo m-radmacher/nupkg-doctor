@@ -49,6 +49,7 @@ const fast_xml_parser_1 = __nccwpck_require__(2603);
 const path_1 = __importDefault(__nccwpck_require__(1017));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const repository = core.getInput('repository');
         const dir = core.getInput('directory');
         const base = process.env.GITHUB_WORKSPACE;
         const baseDirectory = path_1.default.join(base, dir);
@@ -92,12 +93,18 @@ function run() {
         core.debug("Parsed .nuspec content: " + JSON.stringify(jsonObject));
         console.log("Parsed .nuspec file. Modifying file...");
         // Add fields to object
-        jsonObject.metadata.repository = "Test";
+        jsonObject.package.metadata.repository = {
+            "@_type": "git",
+            "url": `https://github.com/${repository}`
+        };
         // Write new .nuspec File
         const builder = new fast_xml_parser_1.XMLBuilder({ format: true, ignoreAttributes: false });
         const xmlContent = builder.build(jsonObject);
         core.debug("Modified XML: " + xmlContent);
         fs.writeFileSync(nuspecFile, xmlContent);
+        // Zip files
+        // Change .zip file ending to .nupkg
+        // Push .nupkg to GitHub Registry
     });
 }
 run();
