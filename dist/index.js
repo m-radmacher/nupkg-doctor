@@ -65,12 +65,7 @@ function run() {
             throw new Error("Could not find .nupkg file. Make sure it got generated.");
         }
         console.log("Found .nupkg file. Extracting...");
-        try {
-            yield (0, extract_zip_1.default)(nupkgFile, { dir: "extracted-nupkg" });
-        }
-        catch (err) {
-            console.log(err);
-        }
+        yield (0, extract_zip_1.default)(path_1.default.join(baseDirectory, nupkgFile), { dir: "extracted-nupkg" });
         // Find .nuspec file
         console.log("Extracted .nupkg file content. Searching for .nuspec file...");
         let nuspecFile;
@@ -86,7 +81,7 @@ function run() {
         }
         console.log('Found .nuspec file. Reading File...');
         // Read .nuspec file
-        const nuspecFileContent = fs.readFileSync(nuspecFile);
+        const nuspecFileContent = fs.readFileSync(path_1.default.join(baseDirectory, "extracted-nupkg", nuspecFile));
         core.debug(".nuspec content: " + nuspecFileContent);
         console.log("Read .nuspec file. Parsing file...");
         // Parse .nuspec File

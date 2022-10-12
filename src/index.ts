@@ -22,11 +22,8 @@ async function run() {
     throw new Error("Could not find .nupkg file. Make sure it got generated.");
   }
   console.log("Found .nupkg file. Extracting...");
-  try {
-    await extract(nupkgFile, { dir: "extracted-nupkg" });
-  } catch (err) {
-    console.log(err);
-  }
+
+  await extract(path.join(baseDirectory, nupkgFile), { dir: "extracted-nupkg" });
 
   // Find .nuspec file
   console.log("Extracted .nupkg file content. Searching for .nuspec file...");
@@ -44,7 +41,7 @@ async function run() {
   console.log('Found .nuspec file. Reading File...');
 
   // Read .nuspec file
-  const nuspecFileContent = fs.readFileSync(nuspecFile);
+  const nuspecFileContent = fs.readFileSync(path.join(baseDirectory, "extracted-nupkg", nuspecFile));
   core.debug(".nuspec content: " + nuspecFileContent);
   console.log("Read .nuspec file. Parsing file...")
 
