@@ -6,7 +6,9 @@ import { XMLBuilder, XMLParser } from "fast-xml-parser";
 import path from "path";
 
 async function run() {
-  const baseDirectory = core.getInput('directory');
+  const dir = core.getInput('directory');
+  const base = process.env.GITHUB_WORKSPACE as string;
+  const baseDirectory = path.join(base, dir)
   // list all files & find .nupkg
   let nupkgFile;
   const nupkgFiles = fs.readdirSync(baseDirectory);
@@ -23,7 +25,7 @@ async function run() {
   }
   console.log("Found .nupkg file. Extracting...");
 
-  await extract(path.join(__dirname, baseDirectory, nupkgFile), { dir: path.join(__dirname, baseDirectory, "extracted-nupkg") });
+  await extract(path.join(baseDirectory, nupkgFile), { dir: path.join(baseDirectory, "extracted-nupkg") });
 
   // Find .nuspec file
   console.log("Extracted .nupkg file content. Searching for .nuspec file...");

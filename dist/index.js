@@ -49,7 +49,9 @@ const fast_xml_parser_1 = __nccwpck_require__(2603);
 const path_1 = __importDefault(__nccwpck_require__(1017));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const baseDirectory = core.getInput('directory');
+        const dir = core.getInput('directory');
+        const base = process.env.GITHUB_WORKSPACE;
+        const baseDirectory = path_1.default.join(base, dir);
         // list all files & find .nupkg
         let nupkgFile;
         const nupkgFiles = fs.readdirSync(baseDirectory);
@@ -65,7 +67,7 @@ function run() {
             throw new Error("Could not find .nupkg file. Make sure it got generated.");
         }
         console.log("Found .nupkg file. Extracting...");
-        yield (0, extract_zip_1.default)(path_1.default.join(__dirname, baseDirectory, nupkgFile), { dir: path_1.default.join(__dirname, baseDirectory, "extracted-nupkg") });
+        yield (0, extract_zip_1.default)(path_1.default.join(baseDirectory, nupkgFile), { dir: path_1.default.join(baseDirectory, "extracted-nupkg") });
         // Find .nuspec file
         console.log("Extracted .nupkg file content. Searching for .nuspec file...");
         let nuspecFile;
