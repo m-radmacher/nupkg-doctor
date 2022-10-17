@@ -22,6 +22,10 @@ inputs:
     required: false
     default: true
     description: 'Whether the nuget push command should be run with the SkipDuplicate flag'
+  version:
+    required: false
+    default: ""
+    description: 'Include a SEMVER Version if you want to overwrite the Version'
 runs:
   using: 'node16'
   main: 'dist/index.js'

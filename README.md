@@ -16,12 +16,13 @@ Simply add NUPKG Doctor to your GitHub action and be assured that your package w
 - **token**: A GitHub personal access token to push to the registry. This needs to be from the account you used for the repository.
 - **push**: If set to `true` the action will push to the GitHub action, if set to `false` it will only generate the .nupkg file. (Default: `true`)
 - **skipduplicate**: If set to `true` the `nuget push` command will be run with the  `-SkipDuplicate` flag, if set to `false` that flag will be omitted. (Default: true)
+- **version**: Include a SEMVER Version if you want to overwrite the Version
 
 ## Example Configuration
 
 ```YAML
     - name: Fix nupkg and push to GitHub registry
-      uses: m-radmacher/nupkg-doctor@v1.0.0
+      uses: m-radmacher/nupkg-doctor@v1.2.0
       timeout-minutes: 2
       with:
         directory: HetkampToolbox

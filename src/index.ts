@@ -1,22 +1,31 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
-import extract from 'extract-zip';
-import * as fs from 'fs';
+import extract from "extract-zip";
+import * as fs from "fs";
 import { XMLBuilder, XMLParser } from "fast-xml-parser";
 import path from "path";
-import archiver from 'archiver';
+import archiver from "archiver";
 
 async function run() {
+  const version = core.getInput("version");
   const repository = core.getInput("repository");
   const pat = core.getInput("token");
-  const pushToReg = core.getBooleanInput('push');
-  const skipDuplicate = core.getBooleanInput('skipduplicate');
+  const pushToReg = core.getBooleanInput("push");
+  const skipDuplicate = core.getBooleanInput("skipduplicate");
   const dir = core.getInput("directory");
   const base = process.env.GITHUB_WORKSPACE as string;
   const baseDirectory = path.join(base, dir);
 
   core.debug("Repository: " + repository);
   core.debug("Base directory: " + baseDirectory);
+
+  // Validate Version
+  if (version.trim()) {
+    const versionRegex = new RegExp("^(0|[1-9]d*).(0|[1-9]d*).(0|[1-9]d*)$");
+    if (!versionRegex.exec(version)) {
+      throw new Error("Version *" + version + "* is not a valid semver version. (x.x.x)");
+    }
+  }
 
   // list all files & find .nupkg
   let nupkgFile;
@@ -74,11 +83,19 @@ async function run() {
     "@_url": `https://github.com/${repository}`,
   };
 
+  // Change Version
+  if (version.trim()) {
+    jsonObject.package.metadata.version = version;
+  }
+
   // Write new .nuspec File
   const builder = new XMLBuilder({ format: true, ignoreAttributes: false });
   const xmlContent = builder.build(jsonObject);
   core.debug("Modified XML: " + xmlContent);
-  fs.writeFileSync(path.join(baseDirectory, "extracted-nupkg", nuspecFile), xmlContent);
+  fs.writeFileSync(
+    path.join(baseDirectory, "extracted-nupkg", nuspecFile),
+    xmlContent
+  );
   console.log("Modified .nuspec file. Deleting old .nupkg...");
 
   // delete old .nupkg
