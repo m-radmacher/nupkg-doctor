@@ -64,9 +64,9 @@ function run() {
         core.debug("Version: " + version);
         // Validate Version
         if (version) {
-            const versionRegex = new RegExp("^(0|[1-9]d*).(0|[1-9]d*).(0|[1-9]d*)$");
+            const versionRegex = new RegExp("^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})$");
             if (!versionRegex.exec(version)) {
-                core.debug(`The version string *${version}* does not match ^(0|[1-9]d*).(0|[1-9]d*).(0|[1-9]d*)$`);
+                core.debug(`The version string *${version}* does not match ^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})$`);
                 throw new Error("Version *" + version + "* is not a valid semver version. (x.x.x)");
             }
         }
