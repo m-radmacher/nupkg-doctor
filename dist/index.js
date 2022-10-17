@@ -51,15 +51,25 @@ const path_1 = __importDefault(__nccwpck_require__(1017));
 const archiver_1 = __importDefault(__nccwpck_require__(3084));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const version = core.getInput("version").trim();
         const repository = core.getInput("repository");
         const pat = core.getInput("token");
-        const pushToReg = core.getBooleanInput('push');
-        const skipDuplicate = core.getBooleanInput('skipduplicate');
+        const pushToReg = core.getBooleanInput("push");
+        const skipDuplicate = core.getBooleanInput("skipduplicate");
         const dir = core.getInput("directory");
         const base = process.env.GITHUB_WORKSPACE;
         const baseDirectory = path_1.default.join(base, dir);
         core.debug("Repository: " + repository);
         core.debug("Base directory: " + baseDirectory);
+        core.debug("Version: " + version);
+        // Validate Version
+        if (version) {
+            const versionRegex = new RegExp("^(0|[1-9]d*).(0|[1-9]d*).(0|[1-9]d*)$");
+            if (!versionRegex.exec(version)) {
+                core.debug(`The version string *${version}* does not match ^(0|[1-9]d*).(0|[1-9]d*).(0|[1-9]d*)$`);
+                throw new Error("Version *" + version + "* is not a valid semver version. (x.x.x)");
+            }
+        }
         // list all files & find .nupkg
         let nupkgFile;
         const nupkgFiles = fs.readdirSync(baseDirectory);
@@ -106,6 +116,11 @@ function run() {
             "@_type": "git",
             "@_url": `https://github.com/${repository}`,
         };
+        // Change Version
+        if (version) {
+            jsonObject.package.metadata.version = version;
+            console.log("Set version to " + version);
+        }
         // Write new .nuspec File
         const builder = new fast_xml_parser_1.XMLBuilder({ format: true, ignoreAttributes: false });
         const xmlContent = builder.build(jsonObject);
@@ -117,7 +132,16 @@ function run() {
         console.log("Deleted old .nupkg. Writing new .nupkg...");
         // Zip files
         const archive = (0, archiver_1.default)("zip");
-        const output = fs.createWriteStream(path_1.default.join(baseDirectory, nupkgFile));
+        let outputFile = nupkgFile;
+        if (version) {
+            const nugetName = nupkgFile.split(".")[0];
+            if (!nugetName) {
+                throw new Error("Could not parse NuGet file name");
+            }
+            outputFile = `${nugetName}.${version}.nupkg`;
+            core.debug(`New output file name: ${outputFile}`);
+        }
+        const output = fs.createWriteStream(path_1.default.join(baseDirectory, outputFile));
         output.on("close", () => {
             console.log(`Wrote new .nupkg (${archive.pointer()} bytes). ${pushToReg ? "Pushing .nupkg to GitHub registry..." : ""}`);
         });
@@ -137,7 +161,7 @@ function run() {
         }
         exec.exec("nuget", [
             "push",
-            path_1.default.join(baseDirectory, nupkgFile),
+            path_1.default.join(baseDirectory, outputFile),
             "-Source",
             `https://nuget.pkg.github.com/${owner}/index.json`,
             "-ApiKey",
