@@ -22,7 +22,7 @@ Simply add NUPKG Doctor to your GitHub action and be assured that your package w
 
 ```YAML
     - name: Fix nupkg and push to GitHub registry
-      uses: m-radmacher/nupkg-doctor@v1.2.0
+      uses: m-radmacher/nupkg-doctor@v1.2.1
       timeout-minutes: 2
       with:
         directory: HetkampToolbox
