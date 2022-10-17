@@ -23,7 +23,10 @@ async function run() {
   if (version.trim()) {
     const versionRegex = new RegExp("^(0|[1-9]d*).(0|[1-9]d*).(0|[1-9]d*)$");
     if (!versionRegex.exec(version)) {
-      throw new Error("Version *" + version + "* is not a valid semver version. (x.x.x)");
+      core.debug(`The version string *${version}* does not match ^(0|[1-9]d*).(0|[1-9]d*).(0|[1-9]d*)$`)
+      throw new Error(
+        "Version *" + version + "* is not a valid semver version. (x.x.x)"
+      );
     }
   }
 
@@ -105,7 +108,16 @@ async function run() {
 
   // Zip files
   const archive = archiver("zip");
-  const output = fs.createWriteStream(path.join(baseDirectory, nupkgFile));
+  let outputFile = nupkgFile;
+  if (version.trim()) {
+    const nugetName = nupkgFile.split(".")[0];
+    if (!nugetName) {
+      throw new Error("Could not parse NuGet file name");
+    }
+    outputFile = `${nugetName}.${version}.nupkg`;
+    core.debug(`New output file name: ${outputFile}`);
+  }
+  const output = fs.createWriteStream(path.join(baseDirectory, outputFile));
   output.on("close", () => {
     console.log(
       `Wrote new .nupkg (${archive.pointer()} bytes). ${
@@ -134,7 +146,7 @@ async function run() {
     "nuget",
     [
       "push",
-      path.join(baseDirectory, nupkgFile),
+      path.join(baseDirectory, outputFile),
       "-Source",
       `https://nuget.pkg.github.com/${owner}/index.json`,
       "-ApiKey",
