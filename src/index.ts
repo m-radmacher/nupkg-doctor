@@ -7,7 +7,7 @@ import path from "path";
 import archiver from "archiver";
 
 async function run() {
-  const version = core.getInput("version");
+  const version = core.getInput("version").trim();
   const repository = core.getInput("repository");
   const pat = core.getInput("token");
   const pushToReg = core.getBooleanInput("push");
@@ -18,9 +18,10 @@ async function run() {
 
   core.debug("Repository: " + repository);
   core.debug("Base directory: " + baseDirectory);
+  core.debug("Version: " + version);
 
   // Validate Version
-  if (version.trim()) {
+  if (version) {
     const versionRegex = new RegExp("^(0|[1-9]d*).(0|[1-9]d*).(0|[1-9]d*)$");
     if (!versionRegex.exec(version)) {
       core.debug(`The version string *${version}* does not match ^(0|[1-9]d*).(0|[1-9]d*).(0|[1-9]d*)$`)
@@ -87,7 +88,7 @@ async function run() {
   };
 
   // Change Version
-  if (version.trim()) {
+  if (version) {
     jsonObject.package.metadata.version = version;
     console.log("Set version to " + version);
   }
@@ -109,7 +110,7 @@ async function run() {
   // Zip files
   const archive = archiver("zip");
   let outputFile = nupkgFile;
-  if (version.trim()) {
+  if (version) {
     const nugetName = nupkgFile.split(".")[0];
     if (!nugetName) {
       throw new Error("Could not parse NuGet file name");
