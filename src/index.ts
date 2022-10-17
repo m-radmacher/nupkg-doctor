@@ -86,6 +86,7 @@ async function run() {
   // Change Version
   if (version.trim()) {
     jsonObject.package.metadata.version = version;
+    console.log("Set version to " + version);
   }
 
   // Write new .nuspec File
