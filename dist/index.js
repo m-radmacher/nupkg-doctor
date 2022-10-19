@@ -66,8 +66,8 @@ function run() {
         if (version) {
             const versionRegex = new RegExp("^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})$");
             if (!versionRegex.exec(version)) {
-                core.debug(`The version string *${version}* does not match ^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})$`);
-                throw new Error("Version *" + version + "* is not a valid semver version. (x.x.x)");
+                core.debug(`The version string *${version}* does not match ^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})(.([0-9]{1,}))?$`);
+                throw new Error("Version *" + version + "* is not a valid version. (x.x.x.x or x.x.x)");
             }
         }
         // list all files & find .nupkg
