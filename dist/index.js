@@ -64,7 +64,7 @@ function run() {
         core.debug("Version: " + version);
         // Validate Version
         if (version) {
-            const versionRegex = new RegExp("^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})$");
+            const versionRegex = new RegExp("^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})(.([0-9]{1,}))?$");
             if (!versionRegex.exec(version)) {
                 core.debug(`The version string *${version}* does not match ^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})(.([0-9]{1,}))?$`);
                 throw new Error("Version *" + version + "* is not a valid version. (x.x.x.x or x.x.x)");
