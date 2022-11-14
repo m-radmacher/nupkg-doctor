@@ -158,7 +158,7 @@ async function run() {
         `Could not find AssemblyInfo.cs file at ${assemblyInfoPath}`
       );
     }
-    const assemblyInfo = fs.readFileSync(assemblyInfoPath).toString("utf8");
+    let assemblyInfo = fs.readFileSync(assemblyInfoPath).toString("utf8");
     console.log("Read AssemblyInfo.cs. Updating Version...");
 
     core.debug(`Current AssemblyInfo.cs content: \n${assemblyInfo}`);
@@ -166,7 +166,7 @@ async function run() {
     const assemblyVersionRegex = new RegExp(
       '[assembly: AssemblyVersion(".*")]'
     );
-    assemblyInfo.replace(
+    assemblyInfo = assemblyInfo.replace(
       assemblyVersionRegex,
       `[assembly: AssemblyVersion("${version}")]`
     );
@@ -174,7 +174,7 @@ async function run() {
     const assemblyFileVersionRegex = new RegExp(
       '[assembly: AssemblyFileVersion(".*")]'
     );
-    assemblyInfo.replace(
+    assemblyInfo = assemblyInfo.replace(
       assemblyFileVersionRegex,
       `[assembly: AssemblyFileVersion("${version}")]`
     );
