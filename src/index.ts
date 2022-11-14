@@ -164,19 +164,25 @@ async function run() {
     core.debug(`Current AssemblyInfo.cs content: \n${assemblyInfo}`);
     // Update [assembly: AssemblyVersion("X")]
     const assemblyVersionRegex = new RegExp(
-      '\[assembly: AssemblyVersion\(".*"\)\]'
+      'assembly: AssemblyVersion\(".*"\)',
+      "gm"
     );
+    core.debug(`assemblyVersionRegex: ${assemblyVersionRegex.toString()}`);
     assemblyInfo = assemblyInfo.replace(
       assemblyVersionRegex,
-      `[assembly: AssemblyVersion("${version}")]`
+      `assembly: AssemblyVersion("${version}")`
     );
     // Update [assembly: AssemblyFileVersion("2022.1.0.0")]
     const assemblyFileVersionRegex = new RegExp(
-      '\[assembly: AssemblyFileVersion\(".*"\)\]'
+      'assembly: AssemblyFileVersion\(".*"\)',
+      "gm"
+    );
+    core.debug(
+      `assemblyFileVersionRegex: ${assemblyFileVersionRegex.toString()}`
     );
     assemblyInfo = assemblyInfo.replace(
       assemblyFileVersionRegex,
-      `[assembly: AssemblyFileVersion("${version}")]`
+      `assembly: AssemblyFileVersion("${version}")`
     );
     core.debug(`Updated AssemblyInfo.cs content: \n${assemblyInfo}`);
     console.log("Updated Version. Writing AssemblyInfo.cs...");
