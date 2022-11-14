@@ -59,7 +59,7 @@ function run() {
         const dir = core.getInput("directory");
         const base = process.env.GITHUB_WORKSPACE;
         const baseDirectory = path_1.default.join(base, dir);
-        const assemblyInfoPath = core.getInput("assemblyInfoPath");
+        const assemblyInfoPath = path_1.default.join(base, core.getInput("assemblyInfoPath"));
         const writeAssemblyInfo = core.getInput("writeAssemblyInfo");
         core.debug(`Repository: ${repository}`);
         core.debug(`Base directory: ${baseDirectory}`);

@@ -15,7 +15,7 @@ async function run() {
   const dir = core.getInput("directory");
   const base = process.env.GITHUB_WORKSPACE as string;
   const baseDirectory = path.join(base, dir);
-  const assemblyInfoPath = core.getInput("assemblyInfoPath");
+  const assemblyInfoPath = path.join(base, core.getInput("assemblyInfoPath"));
   const writeAssemblyInfo = core.getInput("writeAssemblyInfo");
 
   core.debug(`Repository: ${repository}`);
