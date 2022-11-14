@@ -26,6 +26,14 @@ inputs:
     required: false
     default: ""
     description: 'Include a SEMVER Version if you want to overwrite the Version'
+  assemblyInfoPath:
+    required: false
+    default: ""
+    description: 'Path to the AssemblyInfo.cs file. Only required if you want nupkg-doctor to update the Version info in that file'
+  writeAssemblyInfo:
+    required: false
+    default: false
+    description: 'Whether you want nupkg-doctor to write the verion to the AssemblyInfo.cs file'
 runs:
   using: 'node16'
   main: 'dist/index.js'

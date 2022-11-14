@@ -15,16 +15,22 @@ async function run() {
   const dir = core.getInput("directory");
   const base = process.env.GITHUB_WORKSPACE as string;
   const baseDirectory = path.join(base, dir);
+  const assemblyInfoPath = core.getInput("assemblyInfoPath");
+  const writeAssemblyInfo = core.getInput("writeAssemblyInfo");
 
-  core.debug("Repository: " + repository);
-  core.debug("Base directory: " + baseDirectory);
-  core.debug("Version: " + version);
+  core.debug(`Repository: ${repository}`);
+  core.debug(`Base directory: ${baseDirectory}`);
+  core.debug(`Version: ${version}`);
 
   // Validate Version
   if (version) {
-    const versionRegex = new RegExp("^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})(.([0-9]{1,}))?$");
+    const versionRegex = new RegExp(
+      "^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})(.([0-9]{1,}))?$"
+    );
     if (!versionRegex.exec(version)) {
-      core.debug(`The version string *${version}* does not match ^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})(.([0-9]{1,}))?$`)
+      core.debug(
+        `The version string *${version}* does not match ^([0-9]{1,}).([0-9]{1,}).([0-9]{1,})(.([0-9]{1,}))?$`
+      );
       throw new Error(
         "Version *" + version + "* is not a valid version. (x.x.x.x or x.x.x)"
       );
@@ -134,6 +140,51 @@ async function run() {
   archive.directory(path.join(baseDirectory, "extracted-nupkg"), false);
   await archive.finalize();
 
+  // Write AssemblyInfo.cs file
+  if (writeAssemblyInfo) {
+    console.log(
+      "Writing to AssemblyInfo.cs is enabled. Reading current AssemblyInfo.cs..."
+    );
+    core.debug(`AssemblyInfo.cs path: ${assemblyInfoPath}`);
+    if (!assemblyInfoPath) {
+      console.error(
+        "Writing to AssemblyInfo.cs is enabled, but no path was set. Make sure you set *assemblyInfoPath*."
+      );
+      process.exit(1);
+      return;
+    }
+    if (!fs.existsSync(assemblyInfoPath)) {
+      console.error(
+        `Could not find AssemblyInfo.cs file at ${assemblyInfoPath}`
+      );
+    }
+    const assemblyInfo = fs.readFileSync(assemblyInfoPath).toString("utf8");
+    console.log("Read AssemblyInfo.cs. Updating Version...");
+
+    core.debug(`Current AssemblyInfo.cs content: \n${assemblyInfo}`);
+    // Update [assembly: AssemblyVersion("X")]
+    const assemblyVersionRegex = new RegExp(
+      '[assembly: AssemblyVersion(".*")]'
+    );
+    assemblyInfo.replace(
+      assemblyVersionRegex,
+      `[assembly: AssemblyVersion("${version}")]`
+    );
+    // Update [assembly: AssemblyFileVersion("2022.1.0.0")]
+    const assemblyFileVersionRegex = new RegExp(
+      '[assembly: AssemblyFileVersion(".*")]'
+    );
+    assemblyInfo.replace(
+      assemblyFileVersionRegex,
+      `[assembly: AssemblyFileVersion("${version}")]`
+    );
+    core.debug(`Updated AssemblyInfo.cs content: \n${assemblyInfo}`);
+    console.log("Updated Version. Writing AssemblyInfo.cs...");
+
+    fs.writeFileSync(assemblyInfoPath, assemblyInfo);
+    console.log("Wrote updated AssemblyInfo.cs file.");
+  }
+
   if (!pushToReg) return;
 
   // Push .nupkg to GitHub Registry
@@ -143,7 +194,7 @@ async function run() {
       "Could not find owner of repository. Make sure the repository you passed is valid (<Owner>/<Repository>)"
     );
   }
-  exec.exec(
+  await exec.exec(
     "nuget",
     [
       "push",

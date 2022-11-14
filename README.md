@@ -17,6 +17,8 @@ Simply add NUPKG Doctor to your GitHub action and be assured that your package w
 - **push**: If set to `true` the action will push to the GitHub action, if set to `false` it will only generate the .nupkg file. (Default: `true`)
 - **skipduplicate**: If set to `true` the `nuget push` command will be run with the  `-SkipDuplicate` flag, if set to `false` that flag will be omitted. (Default: true)
 - **version**: Include a SEMVER Version if you want to overwrite the Version
+- **assemblyInfoPath**: Path to the AssemblyInfo.cs file. Only required if you want nupkg-doctor to update the Version info in that file
+- **writeAssemblyInfo**: Whether you want nupkg-doctor to write to the AssemblyInfo.cs file and push the change to the repository
 
 ## Example Configuration
 
