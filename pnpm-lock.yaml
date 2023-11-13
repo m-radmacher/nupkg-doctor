@@ -23,8 +23,8 @@ dependencies:
 
 devDependencies:
   '@types/archiver':
-    specifier: ^5.3.2
-    version: 5.3.2
+    specifier: ^6.0.1
+    version: 6.0.1
   '@types/node':
     specifier: ^20.8.3
     version: 20.8.3
@@ -63,8 +63,8 @@ packages:
     resolution: {integrity: sha512-wi9JjgKLYS7U/z8PPbco+PvTb/nRWjeoFlJ1Qer83k/3C5PHQi28hiVdeE2kHXmIL99mQFawx8qt/JPjZilJ8Q==}
     dev: false
 
-  /@types/archiver@5.3.2:
-    resolution: {integrity: sha512-IctHreBuWE5dvBDz/0WeKtyVKVRs4h75IblxOACL92wU66v+HGAfEYAOyXkOFphvRJMhuXdI9huDXpX0FC6lCw==}
+  /@types/archiver@6.0.1:
+    resolution: {integrity: sha512-F2+JkmDYvtQrtb2YldwL0apRB1/WB6ub+1zVF/bKp3TOygUMFqfOLuw5Fj62Q+DPwJUFz1eocMxJMu7yVpplZA==}
     dependencies:
       '@types/readdir-glob': 1.1.1
     dev: true
