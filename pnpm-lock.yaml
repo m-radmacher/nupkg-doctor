@@ -29,8 +29,8 @@ devDependencies:
     specifier: ^20.10.1
     version: 20.10.1
   '@vercel/ncc':
-    specifier: ^0.38.0
-    version: 0.38.0
+    specifier: ^0.38.1
+    version: 0.38.1
   rimraf:
     specifier: ^3.0.2
     version: 3.0.2
@@ -88,8 +88,8 @@ packages:
     dev: false
     optional: true
 
-  /@vercel/ncc@0.38.0:
-    resolution: {integrity: sha512-B4YKZMm/EqMptKSFyAq4q2SlgJe+VCmEH6Y8gf/E1pTlWbsUJpuH1ymik2Ex3aYO5mCWwV1kaSYHSQOT8+4vHA==}
+  /@vercel/ncc@0.38.1:
+    resolution: {integrity: sha512-IBBb+iI2NLu4VQn3Vwldyi2QwaXt5+hTyh58ggAMoCGE6DJmPvwL3KPBWcJl1m9LYPChBLE980Jw+CS4Wokqxw==}
     hasBin: true
     dev: true
 
