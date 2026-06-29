@@ -131,6 +131,9 @@ async function run() {
     console.error("Encountered an error while zipping files.");
     throw err;
   });
+  arch.on("warning", (err) => {
+    console.warn("Encountered an warning while zipping files: ", err);
+  });
   arch.pipe(output);
   arch.directory(path.join(baseDirectory, "extracted-nupkg"), false);
   await arch.finalize();
