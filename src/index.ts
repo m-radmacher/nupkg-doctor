@@ -46,7 +46,7 @@ async function run() {
 	}
 	console.log(`Found .nupkg file (${nupkgFile}). Extracting...`);
 
-	const zipDir = await unzipper.Open.file(nupkgFile);
+	const zipDir = await unzipper.Open.file(path.join(baseDirectory, nupkgFile));
 	await zipDir.extract({ path: path.join(baseDirectory, 'extracted-nupkg') })
 
 	// Find .nuspec file
@@ -135,7 +135,7 @@ async function run() {
 			'Could not find owner of repository. Make sure the repository you passed is valid (<Owner>/<Repository>)',
 		);
 	}
-	exec.exec(
+	await exec.exec(
 		'nuget',
 		[
 			'push',
@@ -161,4 +161,6 @@ async function run() {
 	console.log('Pushed .nupkg to GitHub repository.');
 }
 
-run();
+run().catch((error) => {
+    core.setFailed(`Action failed: ${error.message}`);
+});
