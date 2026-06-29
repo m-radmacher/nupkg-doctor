@@ -16,11 +16,11 @@ inputs:
     description: 'A Personal access token to push to the GitHub registry'
   push:
     required: false
-    default: true
+    default: "true"
     description: 'Whether this function should run nuget push'
   skipduplicate:
     required: false
-    default: true
+    default: "true"
     description: 'Whether the nuget push command should be run with the SkipDuplicate flag'
   version:
     required: false

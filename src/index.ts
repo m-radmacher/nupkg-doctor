@@ -2,9 +2,10 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import extract from "extract-zip";
 import * as fs from "fs";
-import { XMLBuilder, XMLParser } from "fast-xml-parser";
+import { XMLParser } from "fast-xml-parser";
+import XMLBuilder from "fast-xml-builder"
 import path from "path";
-import archiver from "archiver";
+import { ZipArchive } from "archiver";
 
 async function run() {
   const version = core.getInput("version").trim();
@@ -108,7 +109,7 @@ async function run() {
   console.log("Deleted old .nupkg. Writing new .nupkg...");
 
   // Zip files
-  const archive = archiver("zip");
+  const arch = new ZipArchive();
   let outputFile = nupkgFile;
   if (version) {
     const nugetName = nupkgFile.split(".")[0];
@@ -121,18 +122,18 @@ async function run() {
   const output = fs.createWriteStream(path.join(baseDirectory, outputFile));
   output.on("close", () => {
     console.log(
-      `Wrote new .nupkg (${archive.pointer()} bytes). ${
+      `Wrote new .nupkg (${arch.pointer()} bytes). ${
         pushToReg ? "Pushing .nupkg to GitHub registry..." : ""
       }`
     );
   });
-  archive.on("error", (err) => {
+  arch.on("error", (err) => {
     console.error("Encountered an error while zipping files.");
     throw err;
   });
-  archive.pipe(output);
-  archive.directory(path.join(baseDirectory, "extracted-nupkg"), false);
-  await archive.finalize();
+  arch.pipe(output);
+  arch.directory(path.join(baseDirectory, "extracted-nupkg"), false);
+  await arch.finalize();
 
   if (!pushToReg) return;
 
