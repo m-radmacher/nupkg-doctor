@@ -44,11 +44,16 @@ async function run() {
 	if (!nupkgFile) {
 		throw new Error('Could not find .nupkg file. Make sure it got generated.');
 	}
-	console.log('Found .nupkg file. Extracting...');
+	console.log(`Found .nupkg file (${nupkgFile}). Extracting...`);
 
-	await extract(path.join(baseDirectory, nupkgFile), {
-		dir: path.join(baseDirectory, 'extracted-nupkg'),
-	});
+	try {
+		await extract(path.join(baseDirectory, nupkgFile), {
+			dir: path.join(baseDirectory, 'extracted-nupkg'),
+		});
+	} catch (err) {
+		console.error('Error extracting .nupkg file: ', err);
+		throw err;
+	}
 
 	// Find .nuspec file
 	console.log('Extracted .nupkg file content. Searching for .nuspec file...');
