@@ -3,7 +3,7 @@ import path from 'node:path';
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import { ZipArchive } from 'archiver';
-import extract from 'extract-zip';
+import unzipper from 'unzipper';
 import XMLBuilder from 'fast-xml-builder';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -46,14 +46,8 @@ async function run() {
 	}
 	console.log(`Found .nupkg file (${nupkgFile}). Extracting...`);
 
-	try {
-		await extract(path.join(baseDirectory, nupkgFile), {
-			dir: path.join(baseDirectory, 'extracted-nupkg'),
-		});
-	} catch (err) {
-		console.error('Error extracting .nupkg file: ', err);
-		throw err;
-	}
+	const zipDir = await unzipper.Open.file(nupkgFile);
+	await zipDir.extract({ path: path.join(baseDirectory, 'extracted-nupkg') })
 
 	// Find .nuspec file
 	console.log('Extracted .nupkg file content. Searching for .nuspec file...');
