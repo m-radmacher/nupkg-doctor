@@ -7,7 +7,7 @@
     "build": "tsc",
     "clean": "rimraf dist/",
     "lint": "biome ci src/",
-    "lint:fix": "biome lint --write src/",
+    "lint:fix": "biome check --write src/",
     "package": "esbuild src/index.ts --bundle --platform=node --target=node24 --format=cjs --minify --outfile=dist/index.js --loader:.json=json",
     "p": "yarn delete && yarn build && yarn package"
   },
