@@ -27,5 +27,5 @@ inputs:
     default: ""
     description: 'Include a SEMVER Version if you want to overwrite the Version'
 runs:
-  using: 'node16'
+  using: 'node24'
   main: 'dist/index.js'
